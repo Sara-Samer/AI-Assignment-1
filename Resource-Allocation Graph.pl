@@ -38,7 +38,7 @@ check_all( _, [], _):- !.
 check_all(H, [[H,_]|_], _):- !.
 
 check_all(H, [[R, N]|T], New_list):-
-	H i= R,
+	H = R,
 	N > 0,
 	N1 is N - 1,
 	New_list is [[R,N1]]|T].
