@@ -35,7 +35,7 @@ check_availabe([H|T], AL):-
 	check_availabe(T, New_list).
 
 check_all( _, [], _):- !.
-check_all(H, [[H,_]|_], _):- !.
+check_all(H, [[H,N]|_], _):- !.
 
 check_all(H, [[R, N]|T], New_list):-
 	H = R,
@@ -44,6 +44,7 @@ check_all(H, [[R, N]|T], New_list):-
 	New_list is [[R,N1]]|T].
 
 check_all(H, [[R,N]|T], New_list):-
+	H = R,
 	New_list is [[R, N]|T],
 	check_all(H, T, New_list).
 	
