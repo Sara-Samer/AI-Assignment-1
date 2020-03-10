@@ -28,8 +28,37 @@ can_run(P, Available).
 
 % Rules Needed
 
-% check_Available(---) -> takes a list of resources & list in
-% available_instances() and checks that all resources in list are Available
+% check_availabe(---) -> takes a list of resources & list in
+% available_instances() and checks that all resources in list are availabe
+check_availabe([],_,_):-!.
+%check_availabe(L1,L2):-
+%check_availabe(L1,L2,L2).
+check_availabe([H|T], A, [[R,N]|T2]):-
+	(H = R; check_availabe(H, A, T2)),
+	N > 0,
+	N = N - 1,
+	check_availabe(T, A, A).
 
 % release(---) -> takes a list of resources & list in
 % available_instances() and returns a new list after the resources are updated
+
+% release(_, _, _).
+% check_Available().
+% available_instances(Available).
+% process(P).
+% can_run(P, Available).
+
+% can_run(P, Available):- 
+%     not(requested(P, _)),
+%     %get list of process P allocated resources
+%     get_allocated_list(P, Allocated),
+%     %release all allocated resources
+%     release(Allocated, Available, NewAvailable).
+
+%can_run(P, Available):- requested(P, _), get_list(P, L, LL).
+
+% get_list(---) -> takes a process and returns a list of it's requested resources
+% get_request_list(P, L):- 
+%     findall(Y, (requested(Z, Y), Z = P), L).
+% get_allocated_list(P, L):- 
+%     findall(Y, (allocated(Z, Y), Z = P), L).
