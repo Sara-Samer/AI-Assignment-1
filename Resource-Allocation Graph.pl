@@ -26,6 +26,14 @@ available_instances([[r1, 5], [r2, 3], [r3, 0]]).
 
 % check_availabe(---) -> takes a list of resources & list in
 % available_instances() and checks that all resources in list are availabe
+check_availabe([],_,_):-!.
+%check_availabe(L1,L2):-
+%check_availabe(L1,L2,L2).
+check_availabe([H|T], A, [[R,N]|T2]):-
+	(H = R; check_availabe(H, A, T2)),
+	N > 0,
+	N = N - 1,
+	check_availabe(T, A, A).
 
 % release(---) -> takes a list of resources & list in
 % available_instances() and returns a new list after the resources are updated
