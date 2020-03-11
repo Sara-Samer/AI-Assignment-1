@@ -21,12 +21,6 @@ requested(p2, r2).
 requested(p4, r4).
 
 available_instances([[r1, 5], [r2, 3], [r3, 0]]).
-% available_instances(Available).
-% process(P).
-% can_run(P, Available).
-
-
-%------------------
 
 :- dynamic finished/1.
 safe_state(X):-
@@ -56,18 +50,6 @@ can_run(P, Available, NewAvailable):-
 	run(NewAvailable).
 
 add_finished(P):- assert(finished(P)).
-
-
-
-%------------------------------------
-
-% Rules Needed
-
-% check_availabe(---) -> takes a list of resources & list in
-% available_instances() and checks that all resources in list are availabe
-%check_availabe(L1,L2):-
-%check_availabe(L1,L2,L2).
-
 
 get_request_list(P, L):- 
     findall(Y, (requested(Z, Y), Z = P), L).
