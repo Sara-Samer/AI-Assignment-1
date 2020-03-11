@@ -84,3 +84,40 @@ get_request_list(P, L):-
 
 get_allocated_list(P, L):- 
     findall(Y, (allocated(Z, Y), Z = P), L).
+% release(---) -> takes a list of resources & list in
+% available_instances() and returns a new list after the resources are updated
+
+release(L,[],[] ).
+
+release(L,[[R|I]|T],E ):-
+    member(R,L),!,
+    findall(R, member(R,L), Bag), 
+    length(Bag, NumOfInstances ),
+    I2 is I + NumOfInstances ,
+    E =[[R|I2]|T2],
+    release(L,T,T2).
+
+release(L,[[R|I]|T],E):-
+	E =[[R|I]|T2],
+	release(L,T,T2).
+
+% release(_, _, _).
+% check_Available().
+% available_instances(Available).
+% process(P).
+% can_run(P, Available).
+
+% can_run(P, Available):- 
+%     not(requested(P, _)),
+%     %get list of process P allocated resources
+%     get_allocated_list(P, Allocated),
+%     %release all allocated resources
+%     release(Allocated, Available, NewAvailable).
+
+%can_run(P, Available):- requested(P, _), get_list(P, L, LL).
+
+% get_list(---) -> takes a process and returns a list of it's requested resources
+% get_request_list(P, L):- 
+%     findall(Y, (requested(Z, Y), Z = P), L).
+% get_allocated_list(P, L):- 
+%     findall(Y, (allocated(Z, Y), Z = P), L).
