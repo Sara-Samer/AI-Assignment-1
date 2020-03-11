@@ -52,6 +52,20 @@ check_all(H, [[R,N]|T], New_list):-
 % release(---) -> takes a list of resources & list in
 % available_instances() and returns a new list after the resources are updated
 
+release(L,[],[] ).
+
+release(L,[[R|I]|T],E ):-
+    member(R,L),!,
+    findall(R, member(R,L), Bag), 
+    length(Bag, NumOfInstances ),
+    I2 is I + NumOfInstances ,
+    E =[[R|I2]|T2],
+    release(L,T,T2).
+
+release(L,[[R|I]|T],E):-
+	E =[[R|I]|T2],
+	release(L,T,T2).
+
 % release(_, _, _).
 % check_Available().
 % available_instances(Available).
