@@ -20,16 +20,18 @@ requested(p2, r3).
 requested(p2, r2).
 requested(p4, r4).
 
+:- dynamic available_instances/1.
+:- dynamic finished/1.
+
 available_instances([[r1, 5], [r2, 3], [r3, 0]]).
 
-:- dynamic finished/1.
 safe_state(X):-
-	available_instances(Available),
-	run(Available),
+	run(),
 	findall(P, finished(P), X).
 
-run(Available):-
+run():-
 	process(P),
+	available_instances(Available),
 	not(finished(P)),
 	can_run(P, Available).
 
@@ -37,8 +39,9 @@ can_run(P, Available):-
 	not(requested(P, _)), 
 	get_allocated_list(P, Allocated), 
 	release(Allocated, Available, NewAvailable),
+	update_available_instances(NewAvailable),
 	add_finished(P),
-	run(NewAvailable).
+	run().
 
 can_run(P, Available, NewAvailable):-
 	requested(P, _),
@@ -46,12 +49,18 @@ can_run(P, Available, NewAvailable):-
 	check_availabe(Requested, Available),
 	get_allocated_list(P, Allocated), 
 	release(Allocated, Available, NewAvailable),
+	update_available_instances(NewAvailable),
 	add_finished(P),
-	run(NewAvailable).
+	run().
 
 add_finished(P):- assert(finished(P)).
 
+update_available_instances(NewAvailable):-
+	retract(available_instances(OldList)),
+	assert(available_instances(NewAvailable)).
+	
 get_request_list(P, L):- 
     findall(Y, (requested(Z, Y), Z = P), L).
+
 get_allocated_list(P, L):- 
     findall(Y, (allocated(Z, Y), Z = P), L).
