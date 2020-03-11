@@ -20,12 +20,12 @@ requested(p2, r3).
 requested(p2, r2).
 requested(p4, r4).
 
+available_instances([[r1, 5], [r2, 3], [r3, 0]]).
+
 :- dynamic available_instances/1.
 :- dynamic finished/1.
 
-available_instances([[r1, 5], [r2, 3], [r3, 0]]).
-
-safe_state(X):-
+afe_state(X):-
 	run(),
 	findall(P, finished(P), X).
 
