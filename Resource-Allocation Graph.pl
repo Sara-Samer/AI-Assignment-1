@@ -1,8 +1,8 @@
 %------------------- Sample test Case -----------------
-process(p1).
-process(p2).
-process(p3).
 process(p4).
+process(p2).
+process(p1).
+process(p3).
 
 
 resource(r1).
@@ -28,10 +28,11 @@ available_instances([[r1, 0], [r2, 0]]).
 
 safe_state(X):-
 	run(),
-	get_finished_list(X), 
+	get_finished_list(X),
+	not(safe_sequence(X)),
 	add_sequence(X),
 	clear_finished().
-
+	
 run():-
 	process(P),
 	available_instances(Available),
@@ -40,10 +41,7 @@ run():-
 		can_run(P, Available)
 	);
 	(
-		check_if_done(),
-		get_finished_list(F),
-		not(safe_sequence(F))
-
+		check_if_done()
 	).
 
 can_run(P, Available):-
@@ -96,7 +94,7 @@ update_available_instances(NewAvailable):-
 	assert(available_instances(NewAvailable)).
 
 clear_finished():-
-	findall(F, finished(F), Finished),
+	get_finished_list(Finished),
 	clear_finished(Finished).
 clear_finished([]):-!.
 clear_finished([H|T]):-
