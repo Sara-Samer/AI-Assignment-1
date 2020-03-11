@@ -20,14 +20,25 @@ available_instances([[r1, 0], [r2, 0]]).
 %available_instances([[r1, 6], [r2, 4], [r3, 1], [r4, 3]]).
 
 :- dynamic available_instances/1.
+:- dynamic original_instances/1.
 :- dynamic finished/1.
 :- dynamic safe_sequence/1.
+
+set():- 
+	available_instances(L), 
+	assert(original_instances(L)).
+
+reset():- 
+	original_instances(L),
+	update_available_instances(L).
 
 % check_availabe(---) -> takes a list of resources & list in
 % available_instances() and checks that all resources in list are availabe
 
 safe_state(X):-
+	set(),
 	run(),
+	reset(),
 	get_finished_list(X),
 	not(safe_sequence(X)),
 	add_sequence(X),
