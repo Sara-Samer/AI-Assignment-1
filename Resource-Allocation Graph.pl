@@ -30,14 +30,28 @@ can_run(P, Available).
 
 % check_availabe(---) -> takes a list of resources & list in
 % available_instances() and checks that all resources in list are availabe
-check_availabe([],_,_):-!.
-%check_availabe(L1,L2):-
-%check_availabe(L1,L2,L2).
-check_availabe([H|T], A, [[R,N]|T2]):-
-	(H = R; check_availabe(H, A, T2)),
+
+
+check_availabe([], _):-!.
+
+check_availabe([H|T], AL):-
+	check_all(H, AL, New_list),
+	check_availabe(T, New_list).
+
+check_all( _, [], _):- !.
+check_all(H, [[H,N]|_], _):- !.
+
+check_all(H, [[R, N]|T], New_list):-
+	H = R,
 	N > 0,
-	N = N - 1,
-	check_availabe(T, A, A).
+	N1 is N - 1,
+	New_list is [[R,N1]]|T].
+
+check_all(H, [[R,N]|T], New_list):-
+	H = R,
+	New_list is [[R, N]|T],
+	check_all(H, T, New_list).
+	
 
 % release(---) -> takes a list of resources & list in
 % available_instances() and returns a new list after the resources are updated
