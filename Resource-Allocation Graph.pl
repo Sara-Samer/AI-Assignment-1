@@ -1,4 +1,4 @@
-------------------- Sample test Case -----------------
+%------------------- Sample test Case -----------------
 process(p1).
 process(p2).
 process(p3).
@@ -21,12 +21,9 @@ requested(p2, r2).
 requested(p4, r4).
 
 available_instances([[r1, 5], [r2, 3], [r3, 0]]).
-available_instances(Available).
-process(P).
-can_run(P, Available).
-%------------------------------------
 
-% Rules Needed
+:- dynamic available_instances/1.
+:- dynamic finished/1.
 
 % check_availabe(---) -> takes a list of resources & list in
 % available_instances() and checks that all resources in list are availabe
@@ -48,27 +45,42 @@ check_all(H, [[R,N]|T], New_list):-
 	New_list = [[R, N]|T2],
 	check_all(H, T, T2).
 	
+safe_state(X):-
+	run(),
+	findall(P, finished(P), X).
 
-% release(---) -> takes a list of resources & list in
-% available_instances() and returns a new list after the resources are updated
+run():-
+	process(P),
+	available_instances(Available),
+	not(finished(P)),
+	can_run(P, Available).
 
-% release(_, _, _).
-% check_Available().
-% available_instances(Available).
-% process(P).
-% can_run(P, Available).
+can_run(P, Available):- 
+	not(requested(P, _)), 
+	get_allocated_list(P, Allocated), 
+	release(Allocated, Available, NewAvailable),
+	update_available_instances(NewAvailable),
+	add_finished(P),
+	run().
 
-% can_run(P, Available):- 
-%     not(requested(P, _)),
-%     %get list of process P allocated resources
-%     get_allocated_list(P, Allocated),
-%     %release all allocated resources
-%     release(Allocated, Available, NewAvailable).
+can_run(P, Available, NewAvailable):-
+	requested(P, _),
+	get_request_list(P, Requested),
+	check_availabe(Requested, Available),
+	get_allocated_list(P, Allocated), 
+	release(Allocated, Available, NewAvailable),
+	update_available_instances(NewAvailable),
+	add_finished(P),
+	run().
 
-%can_run(P, Available):- requested(P, _), get_list(P, L, LL).
+add_finished(P):- assert(finished(P)).
 
-% get_list(---) -> takes a process and returns a list of it's requested resources
-% get_request_list(P, L):- 
-%     findall(Y, (requested(Z, Y), Z = P), L).
-% get_allocated_list(P, L):- 
-%     findall(Y, (allocated(Z, Y), Z = P), L).
+update_available_instances(NewAvailable):-
+	retract(available_instances(OldList)),
+	assert(available_instances(NewAvailable)).
+	
+get_request_list(P, L):- 
+    findall(Y, (requested(Z, Y), Z = P), L).
+
+get_allocated_list(P, L):- 
+    findall(Y, (allocated(Z, Y), Z = P), L).
