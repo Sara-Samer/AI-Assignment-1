@@ -21,9 +21,44 @@ requested(p2, r2).
 requested(p4, r4).
 
 available_instances([[r1, 5], [r2, 3], [r3, 0]]).
-available_instances(Available).
-process(P).
-can_run(P, Available).
+% available_instances(Available).
+% process(P).
+% can_run(P, Available).
+
+
+%------------------
+
+:- dynamic finished/1.
+safe_state(X):-
+	available_instances(Available),
+	run(Available),
+	findall(P, finished(P), X).
+
+run(Available):-
+	process(P),
+	not(finished(P)),
+	can_run(P, Available).
+
+can_run(P, Available):- 
+	not(requested(P, _)), 
+	get_allocated_list(P, Allocated), 
+	release(Allocated, Available, NewAvailable),
+	add_finished(P),
+	run(NewAvailable).
+
+can_run(P, Available, NewAvailable):-
+	requested(P, _),
+	get_request_list(P, Requested),
+	check_availabe(Requested, Available),
+	get_allocated_list(P, Allocated), 
+	release(Allocated, Available, NewAvailable),
+	add_finished(P),
+	run(NewAvailable).
+
+add_finished(P):- assert(finished(P)).
+
+
+
 %------------------------------------
 
 % Rules Needed
@@ -34,26 +69,7 @@ can_run(P, Available).
 %check_availabe(L1,L2,L2).
 
 
-% release(---) -> takes a list of resources & list in
-% available_instances() and returns a new list after the resources are updated
-
-% release(_, _, _).
-% check_Available().
-% available_instances(Available).
-% process(P).
-% can_run(P, Available).
-
-% can_run(P, Available):- 
-%     not(requested(P, _)),
-%     %get list of process P allocated resources
-%     get_allocated_list(P, Allocated),
-%     %release all allocated resources
-%     release(Allocated, Available, NewAvailable).
-
-%can_run(P, Available):- requested(P, _), get_list(P, L, LL).
-
-% get_list(---) -> takes a process and returns a list of it's requested resources
-% get_request_list(P, L):- 
-%     findall(Y, (requested(Z, Y), Z = P), L).
-% get_allocated_list(P, L):- 
-%     findall(Y, (allocated(Z, Y), Z = P), L).
+get_request_list(P, L):- 
+    findall(Y, (requested(Z, Y), Z = P), L).
+get_allocated_list(P, L):- 
+    findall(Y, (allocated(Z, Y), Z = P), L).
