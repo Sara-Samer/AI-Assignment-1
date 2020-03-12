@@ -1,8 +1,8 @@
 %------------------- Sample test Case -----------------
-process(p4).
-process(p2).
 process(p1).
+process(p2).
 process(p3).
+process(p4).
 
 
 resource(r1).
@@ -39,21 +39,45 @@ safe_state(X):-
 	set(),
 	run(),
 	reset(),
-	get_finished_list(X),
-	not(safe_sequence(X)),
-	add_sequence(X),
+	get_finished_list(F),
+	not(safe_sequence(F)),
+	add_sequence(F),
+	get_finished_list(X), 
 	clear_finished().
-	
+
 run():-
 	process(P),
 	available_instances(Available),
 	(
 		not(finished(P)),
-		can_run(P, Available)
+		can_run(P, Available), !
 	);
 	(
-		check_if_done()
+		check_if_done(),
+		reset()
 	).
+
+% safe_state(X):-
+% 	run(),
+% 	safe_sequence(X),
+% 	clear_finished().
+
+% run():-
+% 	process(P),
+% 	available_instances(Available),
+% 	(
+% 		not(finished(P)),
+% 		can_run(P, Available)
+% 	);
+% 	(
+% 		check_if_done(),
+% 		get_finished_list(F),
+% 		not(safe_sequence(F)),
+% 		add_sequence(F),
+% 		clear_finished()
+
+% 	).
+
 
 can_run(P, Available):-
 	get_request_list(P, Requested),
@@ -64,25 +88,18 @@ can_run(P, Available):-
 	add_finished(P),
 	run().
 
+release(_,[],[] ).
+release(L,[[R,I]|T],E ):-
+    member(R,L),
+    findall(R, member(R,L), Bag), 
+    length(Bag, NumOfInstances ),
+    I2 is I + NumOfInstances ,
+    E =[[R,I2]|T2],
+    release(L,T,T2).
 
-
-release([], _, _):-!.
-release([H|T], A, R):-
-	release_resource(H, A, New_list),
-	release(T, New_list, R),
-	(R = New_list,! ; 1 = 1).
-
-release_resource(H, [[R, N]|T], New_list):-
-	(
-		H = R,
-		N1 is N + 1,
-		append([[H, N1]], T, New_list),
-		!
-	);
-	(
-		New_list = [[R, N]|T2],
-		release_resource(H, T, T2)
-	).
+release(L,[[R,I]|T],E):-
+	E =[[R,I]|T2],
+	release(L,T,T2).
 
 check_availabe([], _):-!.
 check_availabe([H|T], A):-
