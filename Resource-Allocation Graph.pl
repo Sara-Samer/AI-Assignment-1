@@ -30,7 +30,9 @@ set():-
 
 reset():- 
 	original_instances(L),
-	update_available_instances(L).
+	update_available_instances(L),
+	retract(original_instances(L)).
+
 
 % check_availabe(---) -> takes a list of resources & list in
 % available_instances() and checks that all resources in list are availabe
@@ -38,11 +40,7 @@ reset():-
 safe_state(X):-
 	set(),
 	run(),
-	reset(),
-	get_finished_list(F),
-	not(safe_sequence(F)),
-	add_sequence(F),
-	get_finished_list(X), 
+	get_finished_list(X),
 	clear_finished().
 
 run():-
@@ -54,7 +52,8 @@ run():-
 	);
 	(
 		check_if_done(),
-		reset()
+		reset(),
+		set(), !
 	).
 
 % safe_state(X):-
