@@ -18,19 +18,48 @@ star([3,2]).
 % Proposed Prdict -> has_star([CurrX, CurrY], NumStar, NewStar)
 
 % Move Left
+move([CurrX, CurrY], [NewX, NewY], left):-
+    NewX is CurrX + 0,
+    NewY is CurrY - 1,
+    check_boundaries([NewX, NewY]).
+    
 % Move Right
+move([CurrX, CurrY], [NewX, NewY], right):-
+    NewX is CurrX + 0,
+    NewY is CurrY + 1,
+    check_boundaries([NewX, NewY]).
 % Move Up
+move([CurrX, CurrY], [NewX, NewY], up):-
+    NewX is CurrX - 1,
+    NewY is CurrY + 0,
+    check_boundaries([NewX, NewY]).
 % Move Down
+move([CurrX, CurrY], [NewX, NewY], down):-
+    NewX is CurrX + 1,
+    NewY is CurrY + 0,
+    check_boundaries([NewX, NewY]).
+% Check if off limits
+check_boundaries([NewX, NewY]):-
+    dim(X,Y),
+    -1 < NewX, NewX < X,
+    -1 < NewY, NewY < Y.
 
 play(Moves, Stars):-
-    start(S).
-    start_game(S, [S], Moves, Stars).
+    start(S),
+    start_game(S, [S], [], 0, Moves, Stars).
 
-start_game(Place, _, _, 0):- end(Place).
-start_game(CurrentPlace, TotalMoves, Sequence, Stars):-
+start_game(Place, _, Moves, Stars, Moves, Stars):- end(Place).
+
+start_game(CurrentPlace, TotalMoves, Sequence, Stars, Moves, TotalStars):-
     move(CurrentPlace, NextPlace, Movment),
-    not(bomb(NextPlace)),
     has_star(NextPlace, Stars, NewStars),
+    not(bomb(NextPlace)),
     not(member(NextPlace, TotalMoves)),
-    start_game(NextPlace, [NextPlace|TotalMoves], [Movment|Sequence], NewStars).
+    append(Sequence, [Movment], NewSequence),
+    start_game(NextPlace, [NextPlace|TotalMoves], NewSequence, NewStars, Moves, TotalStars).
 
+has_star(Place, Stars, NewStars):-
+    star(Place),
+    NewStars is Stars + 1,!.
+has_star(_, Stars, NewStars):-
+    NewStars is Stars.
